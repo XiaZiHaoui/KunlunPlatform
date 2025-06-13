@@ -28,6 +28,7 @@ export interface IStorage {
   getAllModels(): Promise<AiModel[]>;
   getActiveModels(): Promise<AiModel[]>;
   getModelById(id: number): Promise<AiModel | undefined>;
+  insertModels(models: any[]): Promise<void>;
   
   // Conversations
   createConversation(conversation: InsertConversation): Promise<Conversation>;
@@ -94,6 +95,10 @@ export class DatabaseStorage implements IStorage {
   async getModelById(id: number): Promise<AiModel | undefined> {
     const [model] = await db.select().from(kun).where(eq(kun.id, id));
     return model || undefined;
+  }
+
+  async insertModels(models: any[]): Promise<void> {
+    await db.insert(kun).values(models);
   }
 
   // Conversations

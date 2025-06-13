@@ -343,12 +343,10 @@ async function initializeAiModels() {
       },
     ];
 
-    // Use raw SQL to insert models as we don't have insert methods in storage
+    // Actually insert the models into the database
     try {
-      for (const model of defaultModels) {
-        // This would normally be done through storage methods, but we'll use the database directly
-        console.log('Would insert model:', model.displayName);
-      }
+      await storage.insertModels(defaultModels);
+      console.log('Successfully initialized AI models');
     } catch (error) {
       console.error('Error initializing models:', error);
     }
