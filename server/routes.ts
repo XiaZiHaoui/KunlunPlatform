@@ -122,11 +122,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const message = await storage.addMessage(messageData);
-      
-      // Increment usage if it's a user message
-      if (messageData.role === 'user') {
-        await storage.incrementUsage(userId, conversation.modelId);
-      }
 
       // Get AI response for user messages
       if (messageData.role === 'user') {
@@ -149,6 +144,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Call the AI service
           const aiResponse = await aiService.chat(aiModel, chatMessages);
           
+          // Only increment usage if AI service call is successful
+          await storage.incrementUsage(userId, conversation.modelId);
+          
           // Save AI response to database
           const aiMessage = await storage.addMessage({
             conversationId: messageData.conversationId,
@@ -160,11 +158,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } catch (error) {
           console.error('AI service error:', error);
           
-          // Fallback response on error
+          // Don't increment usage on error, provide fallback response
           const fallbackMessage = await storage.addMessage({
             conversationId: messageData.conversationId,
             role: 'assistant',
-            content: `抱歉，${aiModel.displayName}暂时无法响应。请稍后重试。`,
+            content: `抱歉，${aiModel.displayName}暂时无法响应，请稍后重试。此次调用不会计入使用次数。`,
           });
           
           res.json([message, fallbackMessage]);
