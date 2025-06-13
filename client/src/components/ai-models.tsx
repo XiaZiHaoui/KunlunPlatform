@@ -71,12 +71,12 @@ export default function AiModels({ onSelectModel }: AiModelsProps) {
   }
 
   return (
-    <Card>
+    <Card className="h-[600px] flex flex-col">
       <CardHeader>
         <CardTitle className="text-kunlun-blue font-serif">精选AI模型</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto space-y-4 pr-2 custom-scrollbar">
           {models?.map((model) => {
             const IconComponent = modelIcons[model.name] || Brain;
             const categoryInfo = modelCategories[model.category || 'text'];
