@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* Kunlun theme colors */
+  --kunlun-blue: hsl(214, 78%, 33%);
+  --kunlun-bronze: hsl(23, 60%, 49%);
+  --kunlun-gold: hsl(45, 100%, 50%);
+  --kunlun-jade: hsl(153, 100%, 33%);
+  --kunlun-red: hsl(0, 74%, 52%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+  
+  /* Dark mode Kunlun colors */
+  --kunlun-blue: hsl(214, 78%, 45%);
+  --kunlun-bronze: hsl(23, 60%, 55%);
+  --kunlun-gold: hsl(45, 100%, 60%);
+  --kunlun-jade: hsl(153, 100%, 40%);
+  --kunlun-red: hsl(0, 74%, 60%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-kunlun-blue {
+    color: var(--kunlun-blue);
+  }
+  
+  .text-kunlun-bronze {
+    color: var(--kunlun-bronze);
+  }
+  
+  .text-kunlun-gold {
+    color: var(--kunlun-gold);
+  }
+  
+  .text-kunlun-jade {
+    color: var(--kunlun-jade);
+  }
+  
+  .text-kunlun-red {
+    color: var(--kunlun-red);
+  }
+  
+  .bg-kunlun-blue {
+    background-color: var(--kunlun-blue);
+  }
+  
+  .bg-kunlun-bronze {
+    background-color: var(--kunlun-bronze);
+  }
+  
+  .bg-kunlun-gold {
+    background-color: var(--kunlun-gold);
+  }
+  
+  .bg-kunlun-jade {
+    background-color: var(--kunlun-jade);
+  }
+  
+  .bg-kunlun-red {
+    background-color: var(--kunlun-red);
+  }
+  
+  .border-kunlun-blue {
+    border-color: var(--kunlun-blue);
+  }
+  
+  .border-kunlun-bronze {
+    border-color: var(--kunlun-bronze);
+  }
+  
+  .border-kunlun-gold {
+    border-color: var(--kunlun-gold);
+  }
+  
+  .border-kunlun-jade {
+    border-color: var(--kunlun-jade);
+  }
+  
+  .border-kunlun-red {
+    border-color: var(--kunlun-red);
+  }
+  
+  .hover\:bg-kunlun-blue:hover {
+    background-color: var(--kunlun-blue);
+  }
+  
+  .hover\:bg-kunlun-bronze:hover {
+    background-color: var(--kunlun-bronze);
+  }
+  
+  .hover\:bg-kunlun-gold:hover {
+    background-color: var(--kunlun-gold);
+  }
+  
+  .hover\:text-kunlun-gold:hover {
+    color: var(--kunlun-gold);
+  }
+  
+  .hover\:border-kunlun-bronze:hover {
+    border-color: var(--kunlun-bronze);
+  }
+  
+  .bg-kunlun-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23CD7F32' fill-opacity='0.05'%3E%3Cpath d='M30 30l15-15v30l-15-15zM30 30l-15-15v30l15-15z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  
+  .font-serif {
+    font-family: 'Noto Serif SC', serif;
+  }
+}
