@@ -78,7 +78,7 @@ export const messages = pgTable("messages", {
 export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  amount: varchar("amount").notNull(), // Changed to varchar to avoid decimal parsing issues
   method: varchar("method").notNull(), // 'alipay', 'wechat'
   status: varchar("status").notNull().default("pending"), // 'pending', 'completed', 'failed'
   expiresAt: timestamp("expires_at").notNull(),

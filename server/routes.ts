@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertConversationSchema, insertMessageSchema, insertPaymentSchema } from "@shared/schema";
 import { z } from "zod";
+import { aiService } from "./aiService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -127,15 +128,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.incrementUsage(userId, conversation.modelId);
       }
 
-      // TODO: Integrate with actual AI models here
-      // For now, return a mock response
+      // Get AI response for user messages
       if (messageData.role === 'user') {
-        const aiResponse = await storage.addMessage({
-          conversationId: messageData.conversationId,
-          role: 'assistant',
-          content: `这是来自AI模型的回复：${messageData.content}`,
-        });
-        res.json([message, aiResponse]);
+        // Get the AI model details
+        const aiModel = await storage.getModelById(conversation.modelId);
+        if (!aiModel) {
+          return res.status(404).json({ message: "AI model not found" });
+        }
+
+        // Get conversation history for context
+        const conversationMessages = await storage.getConversationMessages(messageData.conversationId);
+        
+        // Format messages for AI service
+        const chatMessages = conversationMessages.map(msg => ({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content,
+        }));
+
+        try {
+          // Call the AI service
+          const aiResponse = await aiService.chat(aiModel, chatMessages);
+          
+          // Save AI response to database
+          const aiMessage = await storage.addMessage({
+            conversationId: messageData.conversationId,
+            role: 'assistant',
+            content: aiResponse.content,
+          });
+          
+          res.json([message, aiMessage]);
+        } catch (error) {
+          console.error('AI service error:', error);
+          
+          // Fallback response on error
+          const fallbackMessage = await storage.addMessage({
+            conversationId: messageData.conversationId,
+            role: 'assistant',
+            content: `抱歉，${aiModel.displayName}暂时无法响应。请稍后重试。`,
+          });
+          
+          res.json([message, fallbackMessage]);
+        }
       } else {
         res.json(message);
       }
@@ -273,73 +306,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
 async function initializeAiModels() {
   const models = await storage.getAllModels();
   if (models.length === 0) {
-    // Insert default AI models
+    // Insert default AI models with real API endpoints
     const defaultModels = [
       {
-        name: 'gpt-4',
-        displayName: '龙神GPT-4',
-        provider: 'OpenAI',
-        description: '最强大的语言理解与生成模型，擅长复杂推理、创意写作和代码生成',
-        accuracy: 95,
-        speed: 'fast',
-        category: 'text',
-        isActive: true,
-        requiresVip: false,
-      },
-      {
-        name: 'claude',
-        displayName: '凤凰Claude',
-        provider: 'Anthropic',
-        description: '注重安全性和有用性的AI助手，擅长深度分析、学术研究和安全对话',
-        accuracy: 93,
-        speed: 'medium',
-        category: 'text',
-        isActive: true,
-        requiresVip: false,
-      },
-      {
-        name: 'gemini',
-        displayName: '麒麟Gemini',
-        provider: 'Google',
-        description: '支持文本、图像、音频多模态处理的先进AI模型，适合综合性任务处理',
-        accuracy: 91,
-        speed: 'fast',
-        category: 'multimodal',
-        isActive: true,
-        requiresVip: true,
-      },
-      {
-        name: 'dall-e',
-        displayName: '神笔DALL-E',
-        provider: 'OpenAI',
-        description: '革命性的文本到图像生成模型，能够创造出惊人的艺术作品和概念图像',
-        accuracy: 88,
-        speed: 'medium',
-        category: 'image',
-        isActive: true,
-        requiresVip: true,
-      },
-      {
-        name: 'midjourney',
-        displayName: '幻境Midjourney',
-        provider: 'Midjourney',
-        description: '专业级艺术图像生成工具，特别擅长创造富有想象力的艺术作品',
+        name: 'deepseek-chat',
+        displayName: '深度求索DeepSeek',
+        provider: 'DeepSeek',
+        description: '免费开源的中文大语言模型，擅长代码生成、逻辑推理和中文对话',
         accuracy: 92,
-        speed: 'slow',
-        category: 'image',
+        speed: 'fast',
+        category: 'text',
+        isActive: true,
+        requiresVip: false,
+      },
+      {
+        name: 'qwen2.5-72b',
+        displayName: '通义千问Qwen2.5',
+        provider: 'Alibaba',
+        description: '阿里巴巴最新开源模型，在中文理解和生成方面表现优异',
+        accuracy: 94,
+        speed: 'fast',
+        category: 'text',
+        isActive: true,
+        requiresVip: false,
+      },
+      {
+        name: 'glm-4-9b',
+        displayName: '智谱清言GLM-4',
+        provider: 'Zhipu AI',
+        description: '智谱AI开源模型，支持多轮对话和复杂推理任务',
+        accuracy: 91,
+        speed: 'medium',
+        category: 'text',
+        isActive: true,
+        requiresVip: false,
+      },
+      {
+        name: 'llama3.1-8b',
+        displayName: '美洲驼Llama3.1',
+        provider: 'Meta',
+        description: 'Meta开源的先进语言模型，在多种任务上表现出色',
+        accuracy: 90,
+        speed: 'fast',
+        category: 'text',
+        isActive: true,
+        requiresVip: false,
+      },
+      {
+        name: 'gpt-4o-mini',
+        displayName: '龙神GPT-4o Mini',
+        provider: 'OpenAI',
+        description: 'OpenAI轻量版模型，平衡性能与成本，适合日常对话',
+        accuracy: 88,
+        speed: 'fast',
+        category: 'text',
         isActive: true,
         requiresVip: true,
       },
       {
-        name: 'codex',
-        displayName: '文曲星CodeX',
-        provider: 'OpenAI',
-        description: '专门优化的代码生成和理解模型，支持多种编程语言和框架',
-        accuracy: 96,
+        name: 'claude-3-haiku',
+        displayName: '凤凰Claude Haiku',
+        provider: 'Anthropic',
+        description: 'Anthropic快速响应模型，注重安全性和准确性',
+        accuracy: 89,
         speed: 'fast',
-        category: 'code',
+        category: 'text',
         isActive: true,
-        requiresVip: false,
+        requiresVip: true,
       },
     ];
 
