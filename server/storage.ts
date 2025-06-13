@@ -23,32 +23,32 @@ export interface IStorage {
   // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
-  
+
   // AI Models
   getAllModels(): Promise<AiModel[]>;
   getActiveModels(): Promise<AiModel[]>;
   getModelById(id: number): Promise<AiModel | undefined>;
   insertModels(models: any[]): Promise<void>;
-  
+
   // Conversations
   createConversation(conversation: InsertConversation): Promise<Conversation>;
   getUserConversations(userId: string): Promise<Conversation[]>;
   getConversationById(id: number): Promise<Conversation | undefined>;
-  
+
   // Messages
   addMessage(message: InsertMessage): Promise<Message>;
   getConversationMessages(conversationId: number): Promise<Message[]>;
-  
+
   // Payments
   createPayment(payment: InsertPayment): Promise<Payment>;
   getUserPayments(userId: string): Promise<Payment[]>;
   updatePaymentStatus(id: number, status: string): Promise<void>;
-  
+
   // Usage tracking
   incrementUsage(userId: string, modelId: number): Promise<void>;
   getUserDailyUsage(userId: string): Promise<number>;
   resetDailyUsage(userId: string): Promise<void>;
-  
+
   // Admin functions
   getAllUsers(): Promise<User[]>;
   getUserStats(): Promise<{
@@ -132,13 +132,13 @@ export class DatabaseStorage implements IStorage {
       .insert(messages)
       .values(message)
       .returning();
-    
+
     // Update conversation timestamp
     await db
       .update(conversations)
       .set({ updatedAt: new Date() })
       .where(eq(conversations.id, message.conversationId));
-    
+
     return newMessage;
   }
 
@@ -210,7 +210,7 @@ export class DatabaseStorage implements IStorage {
     if (user) {
       const lastReset = user.lastUsageReset || new Date(0);
       const shouldReset = lastReset < today;
-      
+
       await db
         .update(users)
         .set({
@@ -260,7 +260,7 @@ export class DatabaseStorage implements IStorage {
   }> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const thisMonth = new Date();
     thisMonth.setDate(1);
     thisMonth.setHours(0, 0, 0, 0);

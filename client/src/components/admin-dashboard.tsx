@@ -162,14 +162,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">总用户数</p>
                   <p className="text-2xl font-bold text-kunlun-blue">
-                    {statsLoading ? '...' : stats?.totalUsers || 0}
+                    {statsLoading ? '-' : stats?.totalUsers || 0}
                   </p>
                 </div>
                 <Users className="w-8 h-8 text-kunlun-blue" />
@@ -183,10 +183,24 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm font-medium text-gray-600">VIP用户</p>
                   <p className="text-2xl font-bold text-kunlun-gold">
-                    {statsLoading ? '...' : stats?.vipUsers || 0}
+                    {statsLoading ? '-' : stats?.vipUsers || 0}
                   </p>
                 </div>
-                <Star className="w-8 h-8 text-kunlun-gold" />
+                <Crown className="w-8 h-8 text-kunlun-gold" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">管理员</p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    {statsLoading ? '-' : stats?.adminUsers || 0}
+                  </p>
+                </div>
+                <Shield className="w-8 h-8 text-purple-600" />
               </div>
             </CardContent>
           </Card>
@@ -197,10 +211,10 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm font-medium text-gray-600">今日调用</p>
                   <p className="text-2xl font-bold text-kunlun-jade">
-                    {statsLoading ? '...' : stats?.todayCalls || 0}
+                    {statsLoading ? '-' : stats?.todayCalls || 0}
                   </p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-kunlun-jade" />
+                <Activity className="w-8 h-8 text-kunlun-jade" />
               </div>
             </CardContent>
           </Card>
@@ -210,12 +224,85 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">月收入</p>
-                  <p className="text-2xl font-bold text-kunlun-red">
-                    ¥{statsLoading ? '...' : stats?.monthlyRevenue || 0}
+                  <p className="text-2xl font-bold text-green-600">
+                    ¥{statsLoading ? '-' : stats?.monthlyRevenue || 0}
                   </p>
                 </div>
-                <DollarSign className="w-8 h-8 text-kunlun-red" />
+                <DollarSign className="w-8 h-8 text-green-600" />
               </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* AI Model Usage Statistics */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-kunlun-blue">AI模型使用统计</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {statsLoading ? (
+                <div className="space-y-3">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-2 bg-gray-200 rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {stats?.modelUsage?.map((model, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">{model.modelName}</span>
+                      <span className="text-sm font-bold text-kunlun-blue">{model.usageCount} 次</span>
+                    </div>
+                  ))}
+                  {(!stats?.modelUsage || stats.modelUsage.length === 0) && (
+                    <p className="text-gray-500 text-center py-4">今日暂无使用记录</p>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-kunlun-blue">7天使用趋势</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {statsLoading ? (
+                <div className="space-y-3">
+                  {[...Array(7)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-2 bg-gray-200 rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {stats?.weeklyTrend?.map((day, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">{day.date}</span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-20 bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-kunlun-blue h-2 rounded-full"
+                            style={{
+                              width: `${Math.min(100, (day.count / Math.max(...(stats?.weeklyTrend?.map(d => d.count) || [1]))) * 100)}%`
+                            }}
+                          ></div>
+                        </div>
+                        <span className="text-sm font-medium text-kunlun-blue">{day.count}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {(!stats?.weeklyTrend || stats.weeklyTrend.length === 0) && (
+                    <p className="text-gray-500 text-center py-4">暂无趋势数据</p>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -223,7 +310,7 @@ export default function AdminDashboard() {
         {/* User Management Table */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-800">用户管理</CardTitle>
+            <CardTitle className="text-kunlun-blue">用户管理</CardTitle>
           </CardHeader>
           <CardContent>
             {usersLoading ? (
@@ -245,7 +332,7 @@ export default function AdminDashboard() {
                   {users?.map((user) => {
                     const roleInfo = getRoleDisplay(user.role);
                     const RoleIcon = roleInfo.icon;
-                    
+
                     return (
                       <TableRow key={user.id}>
                         <TableCell>
@@ -291,7 +378,7 @@ export default function AdminDashboard() {
                                 <SelectItem value="admin">管理员</SelectItem>
                               </SelectContent>
                             </Select>
-                            
+
                             <Button
                               variant="outline"
                               size="sm"
